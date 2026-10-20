@@ -56,7 +56,7 @@ async def start(message: Message, state : FSMContext):
 <b>отношениях, деньгах, реализации и внутреннем состоянии </b> и
 найти то, что мешает прийти к желаемому результату.
 
-В работе мне важно не просто поговорить о проблеме, а помочь тебе <b> увидеть её глубже и запустить здоровое изменение. </b>
+В работе мне важно не просто поговорить о проблеме, а помочь тебе <b>увидеть её глубже и запустить здоровое изменение.</b>
 
 🤍 Эта диагностика — первый шаг
     """, disable_web_page_preview=True, parse_mode='HTML'
@@ -75,7 +75,7 @@ async def start(message: Message, state : FSMContext):
             print(e)
     await asyncio.sleep(3)
     await message.answer('Выбери тему своего запроса, нажав на кнопку ниже ⬇️',
-                                reply_markup=get_request_type_panel())
+    reply_markup=get_request_type_panel())
 
 
 @router.callback_query(F.data.contains('request_type_'))
@@ -84,7 +84,7 @@ async def start_test(callback : CallbackQuery, state : FSMContext):
     rt = callback.data.split('_')[2]
     await state.update_data(request_type=rt)
     await callback.message.answer("""
-    Что сейчас больше всего забирает вашу энергию и внимание?
+    Что сейчас больше всего забирает твою энергию и внимание?
 
 • Выбери из вариантов ответов
 • Или напиши свой вариант
@@ -98,7 +98,7 @@ async def start_test(callback : CallbackQuery, state : FSMContext):
 async def run_first_base_question (message : Message, state : FSMContext):
     client_answer = message.text
     await state.update_data(first_base_answer=client_answer)
-    await message.answer('Если ничего не менять в ближайшие 3-6-12 месяцев, ваш вопрос/проблема решится сама?',
+    await message.answer('Если ничего не менять в ближайшие 3–6–12 месяцев, твой вопрос/проблема решится сама?',
                          reply_markup=get_second_base_question_panel())
     await state.set_state(QuestionState.waiting_for_second_base_question)
 
@@ -106,7 +106,7 @@ async def run_first_base_question (message : Message, state : FSMContext):
 async def run_second_base_question (message : Message, state : FSMContext):
     client_answer = message.text
     await state.update_data(second_base_answer=client_answer)
-    await message.answer('Напиши какой результат/ состояние/ решение хочешь получить? ⬇️')
+    await message.answer('Напиши какой результат/состояние/решение хочешь получить? ⬇️')
     await state.set_state(QuestionState.waiting_for_third_base_question)
 
 @router.message(QuestionState.waiting_for_third_base_question)
@@ -119,7 +119,7 @@ async def run_third_base_question (message : Message, state : FSMContext):
 
     if request_type == 'health':
         await message.answer("""
-        Как ваше внутреннее состояние сейчас отражается на теле и самочувствии?
+        Как твоё внутреннее состояние сейчас отражается на теле и самочувствии?
 
 • Выбери из вариантов ответов
 • Или напиши свой вариант
@@ -128,20 +128,20 @@ async def run_third_base_question (message : Message, state : FSMContext):
 
     elif request_type == 'relationship':
         await message.answer("""
-        Что чаще всего повторяется в ваших отношениях?
+        Что чаще всего повторяется в твоих отношениях?
 
 • Выбери из вариантов ответов
-• Ваш вариант решение
+• Твой вариант
         """, reply_markup=get_first_relationship_question_panel())
         await state.set_state(QuestionState.waiting_for_first_relationship_question)
 
     elif request_type == 'finance':
         await message.answer("""
-        Что сейчас больше всего мешает вам выйти на более высокий финансовый или профессиональный уровень?
+        Что сейчас больше всего мешает тебе выйти на более высокий финансовый или профессиональный уровень?
 
 
 • Выбери из вариантов ответов
-• Ваш вариант
+• Твой вариант
         """, reply_markup=get_first_finance_question_panel())
         await state.set_state(QuestionState.waiting_for_first_finance_question)
 
@@ -150,7 +150,7 @@ async def run_first_health_question(message : Message, state : FSMContext):
     client_answer = message.text
     await state.update_data(first_health_answer=client_answer)
     await message.answer("""
-        Как вы уже пробовали это решать?
+        Какие попытки решить это у тебя уже были?
     """)
     await state.set_state(QuestionState.waiting_for_second_health_question)
 
@@ -159,7 +159,7 @@ async def run_first_relationship_question(message : Message, state : FSMContext)
     client_answer = message.text
     await state.update_data(first_relationship_answer=client_answer)
     await message.answer("""
-        Как вы уже пробовали это решать?
+        Какие попытки решить это у тебя уже были?
     """)
     await state.set_state(QuestionState.waiting_for_second_relationship_question)
 
@@ -168,7 +168,7 @@ async def run_first_finance_question(message : Message, state : FSMContext):
     client_answer = message.text
     await state.update_data(first_finance_answer=client_answer)
     await message.answer("""
-        Как вы обычно реагируете, когда нужно сделать шаг, который может увеличить ваш доход?
+        Как ты обычно реагируешь, когда нужно сделать шаг, который может увеличить твой доход?
 
 • Выбери из вариантов ответов
 • Или напиши свой вариант
@@ -181,7 +181,7 @@ async def run_second_health_question(message : Message, state : FSMContext):
     await state.update_data(second_health_answer=client_answer)
 
     await asyncio.sleep(1)
-    await message.answer('Спасибо за уделенное время 🙏, нажмите на кнопку что бы получить результат',
+    await message.answer('Спасибо за уделённое время 🙏, нажми на кнопку, чтобы получить результат',
                             reply_markup=get_result_panel())
 
 @router.message(QuestionState.waiting_for_second_relationship_question)
@@ -190,7 +190,7 @@ async def run_second_relationship_question(message : Message, state : FSMContext
     await state.update_data(second_relationship_answer=client_answer)
 
     await asyncio.sleep(1)
-    await message.answer('Спасибо за уделенное время 🙏, нажмите на кнопку что бы получить результат',
+    await message.answer('Спасибо за уделённое время 🙏, нажми на кнопку, чтобы получить результат',
                             reply_markup=get_result_panel())
 
 @router.message(QuestionState.waiting_for_second_finance_question)
@@ -199,7 +199,7 @@ async def run_second_finance_question(message : Message, state : FSMContext):
     await state.update_data(second_finance_answer=client_answer)
 
     await asyncio.sleep(1)
-    await message.answer('Спасибо за уделенное время 🙏, нажмите на кнопку что бы получить результат',
+    await message.answer('Спасибо за уделённое время 🙏, нажми на кнопку, чтобы получить результат',
                             reply_markup=get_result_panel())
 
 @router.callback_query(F.data == 'get_result')
@@ -234,7 +234,7 @@ async def get_result(callback : CallbackQuery, state : FSMContext):
     result = get_ai_analysis(request_type, answers)
     await callback.message.answer(result, parse_mode="HTML")
     await callback.message.answer_video_note(video_note=final_video)
-    await callback.message.answer('Можешь выбрать то что тебе больше подходит',
+    await callback.message.answer('Можешь выбрать то, что тебе больше подходит',
                             reply_markup=get_final_panel())
 
 
@@ -257,18 +257,18 @@ async def run_show_reviews(callback : CallbackQuery, state : FSMContext):
         media=media_group.build()
     )
 
-    await callback.message.answer('Можешь выбрать что тебе больше подходит',
+    await callback.message.answer('Можешь выбрать то, что тебе больше подходит',
                                 reply_markup=get_final_panel())
 
 @router.callback_query(F.data == 'get_payment_of_reflection_table')
 async def run_payment_of_reflection_table(callback : CallbackQuery, state : FSMContext):
     await callback.answer()
     await callback.message.answer("""
-    Отлично, хороший выбор.
-Отправь оплату 199 рублей по реквизитам:
+Отлично, хороший выбор!
 
-тут реквизиты
+Оплати 199 рублей по реквизитам:
 
-Напиши с чеком @kris_shabanova, я ни применено отправлю тебе таблицу
+[Реквизиты]
 
+После оплаты отправь чек @kris_shabanova — я сразу пришлю тебе таблицу.
     """)
