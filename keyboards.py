@@ -16,7 +16,7 @@ def get_request_type_panel():
     )
     builder.row(
         InlineKeyboardButton(
-            text="Бизнесс / Финансы", callback_data="request_type_finance"
+            text="Бизнес / Финансы", callback_data="request_type_finance"
         )
     )
     return builder.as_markup()
@@ -80,16 +80,16 @@ def get_first_health_question_panel():
         KeyboardButton(text='Есть проблемы со сном или восстановлением')
     )
     builder.row(
-        KeyboardButton(text='Заедаю/ Появляется лишний вес')
+        KeyboardButton(text='Заедаю / появляется лишний вес')
     )
     builder.row(
         KeyboardButton(text='Часто игнорирую сигналы тела')
     )
     builder.row(
-        KeyboardButton(text='Раздражительность/ полное безразличие')
+        KeyboardButton(text='Раздражительность / полное безразличие')
     )
     builder.row(
-        KeyboardButton(text='Нежелание секса/отсутствие возбуждения')
+        KeyboardButton(text='Нежелание секса / отсутствие возбуждения')
     )
 
     return builder.as_markup(
@@ -105,7 +105,7 @@ def get_first_relationship_question_panel():
         KeyboardButton(text='Я выбираю похожих партнёров')
     )
     builder.row(
-        KeyboardButton(text='Мне сложно говорить о своих желаниях/чувствах/ просить о помощи')
+        KeyboardButton(text='Мне сложно говорить о своих желаниях/чувствах/просить о помощи')
     )
     builder.row(
         KeyboardButton(text='Боюсь потерять человека и подстраиваюсь')
@@ -114,7 +114,7 @@ def get_first_relationship_question_panel():
         KeyboardButton(text='Мне сложно доверять и расслабляться')
     )
     builder.row(
-        KeyboardButton(text='Я часто оказываюсь в роли "спасающей" или «жертвы»')
+        KeyboardButton(text='Я часто оказываюсь в роли «спасающей» или «жертвы»')
     )
     builder.row(
         KeyboardButton(text='Мне сложно построить близкие отношения')
@@ -164,7 +164,7 @@ def get_second_finance_question_panel():
         KeyboardButton(text='Откладываю')
     )
     builder.row(
-        KeyboardButton(text='Ищу ещё информацию и готовлюсь/ Иду ещё обучаться')
+        KeyboardButton(text='Ищу ещё информацию и готовлюсь / Иду ещё обучаться')
     )
     builder.row(
         KeyboardButton(text='Боюсь критики или осуждения')
@@ -187,13 +187,13 @@ def get_final_panel():
     builder = InlineKeyboardBuilder()
 
     builder.row(
-        InlineKeyboardButton(text='👋 Созвон-знакомство 15-30 мин', url='https://t.me/kris_shabanova')
+        InlineKeyboardButton(text='👋 Созвон-знакомство 15–30 мин', url='https://t.me/kris_shabanova')
     )
     builder.row(
         InlineKeyboardButton(text='🧘 Записаться на сессию', url='https://t.me/kris_shabanova')
     )
     builder.row(
-        InlineKeyboardButton(text='✍️ Заполнить таблицу само рефлексии 199₽',
+        InlineKeyboardButton(text='✍️ Заполнить таблицу саморефлексии 199₽',
                                 #callback_data='get_payment_of_reflection_table'
                                 url='https://payform.ru/kpcw5Ln/'
                              )
