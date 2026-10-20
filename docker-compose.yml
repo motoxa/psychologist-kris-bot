@@ -1,6 +1,7 @@
 services:
   bot:
     build: .
+    image: psychologist-kris-bot:latest
     container_name: psychologist-kris-bot
     restart: unless-stopped
     env_file:
