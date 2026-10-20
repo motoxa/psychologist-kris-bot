@@ -52,8 +52,8 @@ async def start(message: Message, state : FSMContext):
 ➡️ <a href='https://t.me/izmeni_gzizn'>Telegram</a>
 ➡️ <a href='https://www.instagram.com/retreat_kris'>Ретриты</a>
 
-Помогаю увидеть причины повторяющихся сценариев в 
-<b>отношениях, деньгах, реализации и внутреннем состоянии </b> и 
+Помогаю увидеть причины повторяющихся сценариев в
+<b>отношениях, деньгах, реализации и внутреннем состоянии </b> и
 найти то, что мешает прийти к желаемому результату.
 
 В работе мне важно не просто поговорить о проблеме, а помочь тебе <b> увидеть её глубже и запустить здоровое изменение. </b>
@@ -85,7 +85,7 @@ async def start_test(callback : CallbackQuery, state : FSMContext):
     await state.update_data(request_type=rt)
     await callback.message.answer("""
     Что сейчас больше всего забирает вашу энергию и внимание?
-    
+
 • Выбери из вариантов ответов
 • Или напиши свой вариант
     """, reply_markup=get_first_base_question_panel())
@@ -131,7 +131,7 @@ async def run_third_base_question (message : Message, state : FSMContext):
         Что чаще всего повторяется в ваших отношениях?
 
 • Выбери из вариантов ответов
-• Ваш вариант решение 
+• Ваш вариант решение
         """, reply_markup=get_first_relationship_question_panel())
         await state.set_state(QuestionState.waiting_for_first_relationship_question)
 
@@ -169,7 +169,7 @@ async def run_first_finance_question(message : Message, state : FSMContext):
     await state.update_data(first_finance_answer=client_answer)
     await message.answer("""
         Как вы обычно реагируете, когда нужно сделать шаг, который может увеличить ваш доход?
-        
+
 • Выбери из вариантов ответов
 • Или напиши свой вариант
     """, reply_markup=get_second_finance_question_panel())
@@ -266,9 +266,9 @@ async def run_payment_of_reflection_table(callback : CallbackQuery, state : FSMC
     await callback.message.answer("""
     Отлично, хороший выбор.
 Отправь оплату 199 рублей по реквизитам:
-    
-тут реквизиты 
-    
+
+тут реквизиты
+
 Напиши с чеком @kris_shabanova, я ни применено отправлю тебе таблицу
-    
+
     """)
