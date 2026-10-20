@@ -47,8 +47,8 @@ def get_ai_analysis(request_type, answers):
 
     if AI_PROVIDER == "gemini":
         generation_config = genai.types.GenerationConfig(
-            max_output_tokens=1500,
-            temperature=0.1,
+            max_output_tokens=4096,
+            temperature=0.2,
         )
         model = genai.GenerativeModel(
             model_name=MODEL_NAME,
@@ -60,7 +60,7 @@ def get_ai_analysis(request_type, answers):
     elif AI_PROVIDER == "claude":
         response = claude_client.messages.create(
             model=MODEL_NAME,
-            max_tokens=700,
+            max_tokens=4096,
             system=system_prompt,
             messages=[
                 {"role": "user", "content": prompt_content}
