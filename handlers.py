@@ -17,9 +17,9 @@ from keyboards import (get_request_type_panel, get_result_panel,
     get_first_health_question_panel, get_first_relationship_question_panel,
     get_first_finance_question_panel, get_second_finance_question_panel,
     get_final_panel)
-from claude_api import get_claude_analysis
+from ai_service import get_ai_analysis
 from aiogram.utils.media_group import MediaGroupBuilder
-from sheet_start import sheet
+from sheet_start import sheet_start
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from sheet_final import sheet_final
@@ -63,14 +63,14 @@ async def start(message: Message, state : FSMContext):
     )
     await state.clear()
     user_id = str(message.from_user.id)
-    existing_ids = sheet.col_values(1)
+    existing_ids = sheet_start.col_values(1)
     if user_id not in existing_ids:
         username=f"@{message.from_user.username}" if message.from_user.username else "None"
         fullname = message.from_user.full_name
         now = datetime.now(ZoneInfo("Asia/Tbilisi"))
         created_at = now.strftime("%d.%m.%Y %H:%M:%S")
         try:
-            sheet.append_row([user_id, username, fullname, created_at])
+            sheet_start.append_row([user_id, username, fullname, created_at])
         except Exception as e:
             print(e)
     await asyncio.sleep(3)
@@ -231,7 +231,7 @@ async def get_result(callback : CallbackQuery, state : FSMContext):
             print(e)
 
 
-    result = get_claude_analysis(request_type, answers)
+    result = get_ai_analysis(request_type, answers)
     await callback.message.answer(result, parse_mode="HTML")
     await callback.message.answer_video_note(video_note=final_video)
     await callback.message.answer('Можешь выбрать то что тебе больше подходит',

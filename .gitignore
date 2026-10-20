@@ -2,3 +2,6 @@
 .idea
 .venv
 creds.json
+__pycache__/
+*.py[cod]
+*$py.class
