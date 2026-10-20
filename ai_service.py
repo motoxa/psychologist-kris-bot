@@ -47,7 +47,8 @@ def get_ai_analysis(request_type, answers):
 
     if AI_PROVIDER == "gemini":
         generation_config = genai.types.GenerationConfig(
-            max_output_tokens=700,
+            max_output_tokens=1500,
+            temperature=0.1,
         )
         model = genai.GenerativeModel(
             model_name=MODEL_NAME,
