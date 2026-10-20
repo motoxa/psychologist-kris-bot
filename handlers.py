@@ -58,7 +58,7 @@ async def start(message: Message, state : FSMContext):
 
 В работе мне важно не просто поговорить о проблеме, а помочь тебе <b> увидеть её глубже и запустить здоровое изменение. </b>
 
-🤍 Эта диагностика - первый шаг
+🤍 Эта диагностика — первый шаг
     """, disable_web_page_preview=True, parse_mode='HTML'
     )
     await state.clear()
