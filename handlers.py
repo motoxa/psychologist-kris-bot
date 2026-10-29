@@ -246,16 +246,12 @@ async def get_result(callback : CallbackQuery, state : FSMContext):
     except Exception as e:
         print(e)
 
-    await callback.bot.send_chat_action(chat_id=callback.message.chat.id, action="typing")
     wait_msg = await callback.message.answer("Внимательно изучаю твои ответы... 🤍")
+    await callback.bot.send_chat_action(chat_id=callback.message.chat.id, action="typing")
 
     result = await get_ai_analysis(request_type, answers)
 
-    try:
-        await wait_msg.delete()
-    except Exception:
-        pass
-
+    await wait_msg.delete()
     await callback.message.answer(result, parse_mode="HTML")
     await callback.message.answer_video_note(video_note=final_video)
     await callback.message.answer(
