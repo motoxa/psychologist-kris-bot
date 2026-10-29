@@ -185,7 +185,8 @@ async def run_second_health_question(message : Message, state : FSMContext):
 
     await asyncio.sleep(1)
     await message.answer(
-        'Спасибо за уделённое время 🙏, нажми на кнопку, чтобы получить результат',
+        'Спасибо за уделённое время 🙏
+Нажми на кнопку, чтобы получить результат',
         reply_markup=get_result_panel()
     )
 
@@ -196,7 +197,8 @@ async def run_second_relationship_question(message : Message, state : FSMContext
 
     await asyncio.sleep(1)
     await message.answer(
-        'Спасибо за уделённое время 🙏, нажми на кнопку, чтобы получить результат',
+        'Спасибо за уделённое время 🙏
+Нажми на кнопку, чтобы получить результат',
         reply_markup=get_result_panel()
     )
 
@@ -207,7 +209,8 @@ async def run_second_finance_question(message : Message, state : FSMContext):
 
     await asyncio.sleep(1)
     await message.answer(
-        'Спасибо за уделённое время 🙏, нажми на кнопку, чтобы получить результат',
+        'Спасибо за уделённое время 🙏
+Нажми на кнопку, чтобы получить результат',
         reply_markup=get_result_panel()
     )
 
@@ -246,7 +249,7 @@ async def get_result(callback : CallbackQuery, state : FSMContext):
     except Exception as e:
         print(e)
 
-    wait_msg = await callback.message.answer("Внимательно изучаю твои ответы и скоро вернусь с результатом 🤍")
+    await callback.message.answer("Внимательно изучаю твои ответы и скоро вернусь с результатом 🤍")
 
     async def typing():
         while True:
@@ -260,7 +263,6 @@ async def get_result(callback : CallbackQuery, state : FSMContext):
     finally:
         typing_task.cancel()
 
-    await wait_msg.delete()
     await callback.message.answer(result, parse_mode="HTML")
     await callback.message.answer_video_note(video_note=final_video)
     await callback.message.answer(
