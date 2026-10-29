@@ -214,6 +214,12 @@ async def run_second_finance_question(message : Message, state : FSMContext):
 @router.callback_query(F.data == 'get_result')
 async def get_result(callback : CallbackQuery, state : FSMContext):
     await callback.answer()
+
+    try:
+        await callback.message.edit_reply_markup(reply_markup=None)
+    except Exception:
+        pass
+
     data = await state.get_data()
     request_type = data.get('request_type')
 
@@ -234,13 +240,22 @@ async def get_result(callback : CallbackQuery, state : FSMContext):
     fullname = callback.from_user.full_name
     now = datetime.now(ZoneInfo("Asia/Tbilisi"))
     created_at = now.strftime("%d.%m.%Y %H:%M:%S")
+
     try:
         sheet_final.append_row([user_id, username, fullname, created_at, request_type,*answers.values()])
     except Exception as e:
         print(e)
 
+    await callback.bot.send_chat_action(chat_id=callback.message.chat.id, action="typing")
+    wait_msg = await callback.message.answer("Внимательно изучаю твои ответы... 🤍")
 
     result = await get_ai_analysis(request_type, answers)
+
+    try:
+        await wait_msg.delete()
+    except Exception:
+        pass
+
     await callback.message.answer(result, parse_mode="HTML")
     await callback.message.answer_video_note(video_note=final_video)
     await callback.message.answer(

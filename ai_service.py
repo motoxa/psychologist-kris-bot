@@ -32,7 +32,6 @@ elif AI_PROVIDER == "claude":
 else:
     raise ValueError(f"Unsupported AI_PROVIDER: {AI_PROVIDER}")
 
-
 def _sync_get_ai_analysis(request_type, answers):
     prompt_content = f"""
 Вот анкета с вопросами:
@@ -68,7 +67,6 @@ def _sync_get_ai_analysis(request_type, answers):
             ]
         )
         return response.content[0].text
-
 
 async def get_ai_analysis(request_type, answers):
     return await asyncio.to_thread(_sync_get_ai_analysis, request_type, answers)
