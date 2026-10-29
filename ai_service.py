@@ -1,5 +1,6 @@
 import os
 import json
+import asyncio
 import anthropic
 import google.generativeai as genai
 from dotenv import load_dotenv
@@ -32,7 +33,7 @@ else:
     raise ValueError(f"Unsupported AI_PROVIDER: {AI_PROVIDER}")
 
 
-def get_ai_analysis(request_type, answers):
+def _sync_get_ai_analysis(request_type, answers):
     prompt_content = f"""
 Вот анкета с вопросами:
 {json.dumps(questions, ensure_ascii=False, indent=2)}
@@ -67,3 +68,7 @@ def get_ai_analysis(request_type, answers):
             ]
         )
         return response.content[0].text
+
+
+async def get_ai_analysis(request_type, answers):
+    return await asyncio.to_thread(_sync_get_ai_analysis, request_type, answers)

@@ -240,7 +240,7 @@ async def get_result(callback : CallbackQuery, state : FSMContext):
         print(e)
 
 
-    result = get_ai_analysis(request_type, answers)
+    result = await get_ai_analysis(request_type, answers)
     await callback.message.answer(result, parse_mode="HTML")
     await callback.message.answer_video_note(video_note=final_video)
     await callback.message.answer(
