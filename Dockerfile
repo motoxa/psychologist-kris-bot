@@ -1,5 +1,5 @@
 # --- Stage 1: Wheels ---
-FROM python:3-slim AS builder
+FROM python:3.14-slim AS builder
 
 WORKDIR /app
 
@@ -12,7 +12,7 @@ RUN pip wheel --no-cache-dir --wheel-dir /app/wheels -r requirements.txt
 
 
 # --- Stage 2: Clean image ---
-FROM python:3-slim
+FROM python:3.14-slim
 
 WORKDIR /app
 
