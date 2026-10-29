@@ -246,10 +246,19 @@ async def get_result(callback : CallbackQuery, state : FSMContext):
     except Exception as e:
         print(e)
 
-    wait_msg = await callback.message.answer("Внимательно изучаю твои ответы... 🤍")
-    await callback.bot.send_chat_action(chat_id=callback.message.chat.id, action="typing")
+    wait_msg = await callback.message.answer("Внимательно изучаю твои ответы и скоро вернусь с результатом 🤍")
 
-    result = await get_ai_analysis(request_type, answers)
+    async def typing():
+        while True:
+            await asyncio.sleep(4)
+            await callback.bot.send_chat_action(chat_id=callback.message.chat.id, action="typing")
+
+    typing_task = asyncio.create_task(typing())
+
+    try:
+        result = await get_ai_analysis(request_type, answers)
+    finally:
+        typing_task.cancel()
 
     await wait_msg.delete()
     await callback.message.answer(result, parse_mode="HTML")
