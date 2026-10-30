@@ -184,11 +184,10 @@ async def run_second_health_question(message : Message, state : FSMContext):
     await state.update_data(second_health_answer=client_answer)
 
     await asyncio.sleep(1)
-    await message.answer(
-        'Спасибо за уделённое время 🙏
-Нажми на кнопку, чтобы получить результат',
-        reply_markup=get_result_panel()
-    )
+    await message.answer("""
+Спасибо за уделённое время 🙏
+Нажми на кнопку, чтобы получить результат
+    """, reply_markup=get_result_panel())
 
 @router.message(QuestionState.waiting_for_second_relationship_question)
 async def run_second_relationship_question(message : Message, state : FSMContext):
@@ -196,11 +195,10 @@ async def run_second_relationship_question(message : Message, state : FSMContext
     await state.update_data(second_relationship_answer=client_answer)
 
     await asyncio.sleep(1)
-    await message.answer(
-        'Спасибо за уделённое время 🙏
-Нажми на кнопку, чтобы получить результат',
-        reply_markup=get_result_panel()
-    )
+    await message.answer("""
+Спасибо за уделённое время 🙏
+Нажми на кнопку, чтобы получить результат
+    """, reply_markup=get_result_panel())
 
 @router.message(QuestionState.waiting_for_second_finance_question)
 async def run_second_finance_question(message : Message, state : FSMContext):
@@ -208,11 +206,10 @@ async def run_second_finance_question(message : Message, state : FSMContext):
     await state.update_data(second_finance_answer=client_answer)
 
     await asyncio.sleep(1)
-    await message.answer(
-        'Спасибо за уделённое время 🙏
-Нажми на кнопку, чтобы получить результат',
-        reply_markup=get_result_panel()
-    )
+    await message.answer("""
+Спасибо за уделённое время 🙏
+Нажми на кнопку, чтобы получить результат
+    """, reply_markup=get_result_panel())
 
 @router.callback_query(F.data == 'get_result')
 async def get_result(callback : CallbackQuery, state : FSMContext):
