@@ -67,7 +67,7 @@ async def start(message: Message, state : FSMContext):
     if user_id not in existing_ids:
         username=f"@{message.from_user.username}" if message.from_user.username else "None"
         fullname = message.from_user.full_name
-        now = datetime.now(ZoneInfo("Asia/Tbilisi"))
+        now = datetime.now(ZoneInfo("Asia/Makassar"))
         created_at = now.strftime("%d.%m.%Y %H:%M:%S")
         try:
             sheet_start.append_row([user_id, username, fullname, created_at])
@@ -238,7 +238,7 @@ async def get_result(callback : CallbackQuery, state : FSMContext):
     user_id = str(callback.from_user.id)
     username=f"@{callback.from_user.username}" if callback.from_user.username else "None"
     fullname = callback.from_user.full_name
-    now = datetime.now(ZoneInfo("Asia/Tbilisi"))
+    now = datetime.now(ZoneInfo("Asia/Makassar"))
     created_at = now.strftime("%d.%m.%Y %H:%M:%S")
 
     try:
