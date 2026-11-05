@@ -37,40 +37,68 @@ FINAL_SHEET_HEADERS = [
 
 TELEGRAM_MESSAGE_LIMIT = 4096
 
+RESULTS_DIR = "/app/.results"
+
+
+def filled_fields(row: list):
+    for header, value in zip(FINAL_SHEET_HEADERS, row):
+        value = "" if value is None else str(value)
+        if value:
+            yield header, value
+
+
 async def notify_owner(bot, row: list, sheet_ok: bool):
     owner_id = os.getenv("OWNER_ID", "").strip()
     if not owner_id:
         return
 
     status = "✅ записано в таблицу" if sheet_ok else "⚠️ НЕ записано в таблицу!"
-    blocks = [f"📝 <b>Новая анкета</b> ({status})"]
-    for header, value in zip(FINAL_SHEET_HEADERS, row):
-        value = "" if value is None else str(value)
-        if not value:
-            continue
-
+    blocks = []
+    for header, value in filled_fields(row):
         chunk_size = 3000
         parts = [value[i:i + chunk_size] for i in range(0, len(value), chunk_size)]
         for n, part in enumerate(parts):
             title = header if n == 0 else f"{header} (продолжение)"
             blocks.append(f"<b>{html.escape(title)}:</b> {html.escape(part)}")
 
+    first = f"📝 <b>Новая анкета</b> ({status})"
     messages, current = [], ""
     for block in blocks:
-        candidate = f"{current}\n\n{block}" if current else block
+        if not messages and not current:
+            candidate = f"{first}\n\n{block}"
+        else:
+            candidate = f"{current}\n{block}"
         if len(candidate) > TELEGRAM_MESSAGE_LIMIT:
-            messages.append(current)
+            messages.append(current or first)
             current = block
         else:
             current = candidate
-    if current:
-        messages.append(current)
+    messages.append(current or first)
 
     try:
         for text in messages:
             await bot.send_message(int(owner_id), text, parse_mode="HTML")
     except Exception as e:
         print(f"Не удалось отправить анкету владельцу: {e}")
+
+
+def save_result_file(row: list, now: datetime, ai_result: str):
+    text = "\n".join(f"{header}: {value}" for header, value in filled_fields(row))
+    text += f"\n\n{ai_result}\n"
+
+    try:
+        os.makedirs(RESULTS_DIR, exist_ok=True)
+        name = now.strftime("%Y-%m-%d-%H-%M-%S")
+        path = os.path.join(RESULTS_DIR, f"{name}.txt")
+        try:
+            f = open(path, "x", encoding="utf-8")
+        except FileExistsError:
+            path = os.path.join(RESULTS_DIR, f"{name}-{row[0]}.txt")
+            f = open(path, "w", encoding="utf-8")
+        with f:
+            f.write(text)
+    except Exception as e:
+        print(f"Не удалось сохранить результат в файл: {e}")
 
 start_video = FSInputFile("video.mp4")
 final_video = FSInputFile("video 2.mp4")
@@ -109,16 +137,16 @@ async def start(message: Message, state : FSMContext):
     )
     await state.clear()
     user_id = str(message.from_user.id)
-    existing_ids = sheet_start.col_values(1)
-    if user_id not in existing_ids:
-        username=f"@{message.from_user.username}" if message.from_user.username else "None"
-        fullname = message.from_user.full_name
-        now = datetime.now(ZoneInfo("Asia/Makassar"))
-        created_at = now.strftime("%d.%m.%Y %H:%M:%S")
-        try:
+    try:
+        existing_ids = sheet_start.col_values(1)
+        if user_id not in existing_ids:
+            username=f"@{message.from_user.username}" if message.from_user.username else "None"
+            fullname = message.from_user.full_name
+            now = datetime.now(ZoneInfo("Asia/Makassar"))
+            created_at = now.strftime("%d.%m.%Y %H:%M:%S")
             sheet_start.append_row([user_id, username, fullname, created_at])
-        except Exception as e:
-            print(e)
+    except Exception as e:
+        print(e)
     await asyncio.sleep(3)
     await message.answer(
         'Выбери тему своего запроса, нажав на кнопку ниже ⬇️',
@@ -266,6 +294,8 @@ async def get_result(callback : CallbackQuery, state : FSMContext):
     except Exception:
         pass
 
+    await callback.message.answer("Внимательно изучаю твои ответы и скоро вернусь с результатом 🤍")
+
     data = await state.get_data()
     request_type = data.get('request_type')
 
@@ -289,6 +319,7 @@ async def get_result(callback : CallbackQuery, state : FSMContext):
 
     row = [user_id, username, fullname, created_at, request_type, *answers.values()]
     sheet_ok = True
+
     try:
         sheet_final.append_row(row)
     except Exception as e:
@@ -297,8 +328,6 @@ async def get_result(callback : CallbackQuery, state : FSMContext):
 
     await notify_owner(callback.bot, row, sheet_ok)
 
-    await callback.message.answer("Внимательно изучаю твои ответы и скоро вернусь с результатом 🤍")
-
     async def typing():
         while True:
             await asyncio.sleep(4)
@@ -306,13 +335,33 @@ async def get_result(callback : CallbackQuery, state : FSMContext):
 
     typing_task = asyncio.create_task(typing())
 
+    result = None
     try:
         result = await get_ai_analysis(request_type, answers)
+        file_text = result or "[AI вернул пустой ответ]"
+    except Exception as e:
+        print(f"Ошибка AI: {e}")
+        file_text = f"[Ответ AI не получен: {e}]"
     finally:
         typing_task.cancel()
 
-    await callback.message.answer(result, parse_mode="HTML")
-    await callback.message.answer_video_note(video_note=final_video)
+    save_result_file(row, now, file_text)
+
+    if result:
+        try:
+            await callback.message.answer(result, parse_mode="HTML")
+        except Exception as e:
+            print(f"Не удалось отправить ответ AI с HTML, отправляю без разметки: {e}")
+            try:
+                await callback.message.answer(result)
+            except Exception as e:
+                print(f"Не удалось отправить ответ AI: {e}")
+
+    try:
+        await callback.message.answer_video_note(video_note=final_video)
+    except Exception as e:
+        print(f"Не удалось отправить видео: {e}")
+
     await callback.message.answer(
         'Можешь выбрать то, что тебе больше подходит',
         reply_markup=get_final_panel()

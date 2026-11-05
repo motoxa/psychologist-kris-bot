@@ -2,6 +2,7 @@
 .idea
 .venv
 creds.json
+.results/
 __pycache__/
 *.py[cod]
 *$py.class

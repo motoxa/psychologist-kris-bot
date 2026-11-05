@@ -8,3 +8,4 @@ services:
       - .env
     volumes:
       - ./reviews:/app/reviews
+      - ./.results:/app/.results
