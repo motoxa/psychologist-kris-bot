@@ -27,6 +27,8 @@ import html
 
 router = Router()
 
+RESULTS_DIR = "/app/.results"
+
 FINAL_SHEET_HEADERS = [
     "USER_ID", "USERNAME", "FULLNAME", "DATE/TIME", "Тема запроса",
     "Первый базовый", "Второй базовый", "Третий базовый",
@@ -37,32 +39,32 @@ FINAL_SHEET_HEADERS = [
 
 TELEGRAM_MESSAGE_LIMIT = 4096
 
-RESULTS_DIR = "/app/.results"
-
-
 def filled_fields(row: list):
     for header, value in zip(FINAL_SHEET_HEADERS, row):
         value = "" if value is None else str(value)
         if value:
             yield header, value
 
-
 async def notify_owner(bot, row: list, sheet_ok: bool):
     owner_id = os.getenv("OWNER_ID", "").strip()
+
     if not owner_id:
         return
 
     status = "✅ записано в таблицу" if sheet_ok else "⚠️ НЕ записано в таблицу!"
     blocks = []
+
     for header, value in filled_fields(row):
         chunk_size = 3000
         parts = [value[i:i + chunk_size] for i in range(0, len(value), chunk_size)]
+
         for n, part in enumerate(parts):
             title = header if n == 0 else f"{header} (продолжение)"
             blocks.append(f"<b>{html.escape(title)}:</b> {html.escape(part)}")
 
     first = f"📝 <b>Новая анкета</b> ({status})"
     messages, current = [], ""
+
     for block in blocks:
         if not messages and not current:
             candidate = f"{first}\n\n{block}"
@@ -73,6 +75,7 @@ async def notify_owner(bot, row: list, sheet_ok: bool):
             current = block
         else:
             current = candidate
+
     messages.append(current or first)
 
     try:
@@ -80,7 +83,6 @@ async def notify_owner(bot, row: list, sheet_ok: bool):
             await bot.send_message(int(owner_id), text, parse_mode="HTML")
     except Exception as e:
         print(f"Не удалось отправить анкету владельцу: {e}")
-
 
 def save_result_file(row: list, now: datetime, ai_result: str):
     text = "\n".join(f"{header}: {value}" for header, value in filled_fields(row))
@@ -90,11 +92,13 @@ def save_result_file(row: list, now: datetime, ai_result: str):
         os.makedirs(RESULTS_DIR, exist_ok=True)
         name = now.strftime("%Y-%m-%d-%H-%M-%S")
         path = os.path.join(RESULTS_DIR, f"{name}.txt")
+
         try:
             f = open(path, "x", encoding="utf-8")
         except FileExistsError:
             path = os.path.join(RESULTS_DIR, f"{name}-{row[0]}.txt")
             f = open(path, "w", encoding="utf-8")
+
         with f:
             f.write(text)
     except Exception as e:
@@ -114,10 +118,8 @@ class QuestionState (StatesGroup):
     waiting_for_first_finance_question = State()
     waiting_for_second_finance_question = State()
 
-
 @router.message(Command("start"))
 async def start(message: Message, state : FSMContext):
-
     await message.answer_video_note(
         video_note=start_video)
     await message.answer( """
@@ -153,7 +155,6 @@ async def start(message: Message, state : FSMContext):
         reply_markup=get_request_type_panel()
     )
 
-
 @router.callback_query(F.data.contains('request_type_'))
 async def start_test(callback : CallbackQuery, state : FSMContext):
     await callback.answer()
@@ -168,7 +169,6 @@ async def start_test(callback : CallbackQuery, state : FSMContext):
 
     #await callback.message.answer(rt)
     await state.set_state(QuestionState.waiting_for_first_base_question)
-
 
 @router.message(QuestionState.waiting_for_first_base_question)
 async def run_first_base_question (message : Message, state : FSMContext):
@@ -336,6 +336,7 @@ async def get_result(callback : CallbackQuery, state : FSMContext):
     typing_task = asyncio.create_task(typing())
 
     result = None
+
     try:
         result = await get_ai_analysis(request_type, answers)
         file_text = result or "[AI вернул пустой ответ]"
@@ -352,6 +353,7 @@ async def get_result(callback : CallbackQuery, state : FSMContext):
             await callback.message.answer(result, parse_mode="HTML")
         except Exception as e:
             print(f"Не удалось отправить ответ AI с HTML, отправляю без разметки: {e}")
+
             try:
                 await callback.message.answer(result)
             except Exception as e:
