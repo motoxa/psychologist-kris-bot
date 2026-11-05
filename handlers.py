@@ -106,8 +106,8 @@ def save_result_file(row: list, now: datetime, ai_result: str):
     except Exception as e:
         print(f"Не удалось сохранить результат в файл: {e}")
 
-start_video = FSInputFile("video.mp4")
-final_video = FSInputFile("video 2.mp4")
+start_video = FSInputFile("video1.mp4")
+final_video = FSInputFile("video2.mp4")
 
 class QuestionState (StatesGroup):
     waiting_for_first_base_question = State()
