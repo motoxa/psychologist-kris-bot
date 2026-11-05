@@ -23,8 +23,54 @@ from sheet_start import sheet_start
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from sheet_final import sheet_final
+import html
 
 router = Router()
+
+FINAL_SHEET_HEADERS = [
+    "USER_ID", "USERNAME", "FULLNAME", "DATE/TIME", "Тема запроса",
+    "Первый базовый", "Второй базовый", "Третий базовый",
+    "Первый по здоровью", "Второй по здоровью",
+    "Первый по отношениям", "Второй по отношениям",
+    "Первый по финансам", "Второй по финансам",
+]
+
+TELEGRAM_MESSAGE_LIMIT = 4096
+
+async def notify_owner(bot, row: list, sheet_ok: bool):
+    owner_id = os.getenv("OWNER_ID", "").strip()
+    if not owner_id:
+        return
+
+    status = "✅ записано в таблицу" if sheet_ok else "⚠️ НЕ записано в таблицу!"
+    blocks = [f"📝 <b>Новая анкета</b> ({status})"]
+    for header, value in zip(FINAL_SHEET_HEADERS, row):
+        value = "" if value is None else str(value)
+        if not value:
+            continue
+
+        chunk_size = 3000
+        parts = [value[i:i + chunk_size] for i in range(0, len(value), chunk_size)]
+        for n, part in enumerate(parts):
+            title = header if n == 0 else f"{header} (продолжение)"
+            blocks.append(f"<b>{html.escape(title)}:</b> {html.escape(part)}")
+
+    messages, current = [], ""
+    for block in blocks:
+        candidate = f"{current}\n\n{block}" if current else block
+        if len(candidate) > TELEGRAM_MESSAGE_LIMIT:
+            messages.append(current)
+            current = block
+        else:
+            current = candidate
+    if current:
+        messages.append(current)
+
+    try:
+        for text in messages:
+            await bot.send_message(int(owner_id), text, parse_mode="HTML")
+    except Exception as e:
+        print(f"Не удалось отправить анкету владельцу: {e}")
 
 start_video = FSInputFile("video.mp4")
 final_video = FSInputFile("video 2.mp4")
@@ -232,7 +278,7 @@ async def get_result(callback : CallbackQuery, state : FSMContext):
         'first_relationship_answer' : data.get('first_relationship_answer', ''),
         'second_relationship_answer': data.get('second_relationship_answer', ''),
         'first_finance_answer': data.get('first_finance_answer', ''),
-        'second_finance_answer': data.get('second_finance_answer'),
+        'second_finance_answer': data.get('second_finance_answer', ''),
     }
 
     user_id = str(callback.from_user.id)
@@ -241,10 +287,15 @@ async def get_result(callback : CallbackQuery, state : FSMContext):
     now = datetime.now(ZoneInfo("Asia/Makassar"))
     created_at = now.strftime("%d.%m.%Y %H:%M:%S")
 
+    row = [user_id, username, fullname, created_at, request_type, *answers.values()]
+    sheet_ok = True
     try:
-        sheet_final.append_row([user_id, username, fullname, created_at, request_type,*answers.values()])
+        sheet_final.append_row(row)
     except Exception as e:
+        sheet_ok = False
         print(e)
+
+    await notify_owner(callback.bot, row, sheet_ok)
 
     await callback.message.answer("Внимательно изучаю твои ответы и скоро вернусь с результатом 🤍")
 
