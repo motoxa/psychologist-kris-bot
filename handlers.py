@@ -24,6 +24,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 from sheet_final import sheet_final
 import html
+import re
 
 router = Router()
 
@@ -45,10 +46,10 @@ def filled_fields(row: list):
         if value:
             yield header, value
 
-async def notify_owner(bot, row: list, sheet_ok: bool):
-    owner_id = os.getenv("OWNER_ID", "").strip()
+async def notify_recipients(bot, row: list, sheet_ok: bool):
+    notify_ids = [i for i in re.split(r"[,;\s]+", os.getenv("NOTIFY_IDS", "")) if i]
 
-    if not owner_id:
+    if not notify_ids:
         return
 
     status = "✅ записано в таблицу" if sheet_ok else "⚠️ НЕ записано в таблицу!"
@@ -78,11 +79,12 @@ async def notify_owner(bot, row: list, sheet_ok: bool):
 
     messages.append(current or first)
 
-    try:
-        for text in messages:
-            await bot.send_message(int(owner_id), text, parse_mode="HTML")
-    except Exception as e:
-        print(f"Не удалось отправить анкету владельцу: {e}")
+    for notify_id in notify_ids:
+        try:
+            for text in messages:
+                await bot.send_message(int(notify_id), text, parse_mode="HTML")
+        except Exception as e:
+            print(f"Не удалось отправить анкету получателю {notify_id}: {e}")
 
 def save_result_file(row: list, now: datetime, ai_result: str):
     text = "\n".join(f"{header}: {value}" for header, value in filled_fields(row))
@@ -326,7 +328,7 @@ async def get_result(callback : CallbackQuery, state : FSMContext):
         sheet_ok = False
         print(e)
 
-    await notify_owner(callback.bot, row, sheet_ok)
+    await notify_recipients(callback.bot, row, sheet_ok)
 
     async def typing():
         while True:
