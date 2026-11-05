@@ -66,7 +66,7 @@ def _sync_get_ai_analysis(request_type, answers):
                 {"role": "user", "content": prompt_content}
             ]
         )
-        return response.content[0].text
+        return "".join(block.text for block in response.content if block.type == "text")
 
 async def get_ai_analysis(request_type, answers):
     return await asyncio.to_thread(_sync_get_ai_analysis, request_type, answers)
